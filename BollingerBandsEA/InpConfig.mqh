@@ -1,10 +1,15 @@
 //+------------------------------------------------------------------+
 //| Input Configuration functions                                    |
 //+------------------------------------------------------------------+
-
+enum LOT_MODE_ENUM{
+   LOT_MODE_FIXED,// fixed lots
+   LOT_MODE_MONEY,// lots based on money
+   LOT_MODE_PCT_ACCOUNT// lots based on % account
+};
 input group "==== General ====";
 static input long InpMagicnumber= 1336;         // magic number
-input double InpVolume = 0.01;                  //lot size
+input double InpVolume = 0.01;                  //lots / money / percent size
+input LOT_MODE_ENUM InpLotMode=LOT_MODE_FIXED;// lot mode
 input int InpStopLoss = 100;                    //stop loss
 input int InpTakeProfit = 200;                  //take profit
 input ENUM_TIMEFRAMES InpTimeframe = PERIOD_H1; //Timeframe

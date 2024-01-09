@@ -78,7 +78,11 @@ void OnTick()
       if(!NormalizePrice(sl,sl)){return;}
       if(!NormalizePrice(tp,tp)){return;}
       
-      trade.PositionOpen(_Symbol,ORDER_TYPE_BUY,InpVolume,currentTick.ask,sl,tp,"Bollinger bands EA");  
+      //calculate lots
+      double lots;
+      if(!CalculateLots(currentTick.bid-sl,lots)){return;}
+      
+      trade.PositionOpen(_Symbol,ORDER_TYPE_BUY,lots,currentTick.ask,sl,tp,"Bollinger bands EA");  
    }
    //check for upper band cross to open a sell position
    if(Trigger(false)){
@@ -88,7 +92,11 @@ void OnTick()
       if(!NormalizePrice(sl,sl)){return;}
       if(!NormalizePrice(tp,tp)){return;}
       
-      trade.PositionOpen(_Symbol,ORDER_TYPE_SELL,InpVolume,currentTick.bid,sl,tp,"Bollinger bands EA");  
+      //calculate lots
+      double lots;
+      if(!CalculateLots(currentTick.bid-sl,lots)){return;}
+      
+      trade.PositionOpen(_Symbol,ORDER_TYPE_SELL,lots,currentTick.bid,sl,tp,"Bollinger bands EA");  
    }
    
    //check for close at cross with base band

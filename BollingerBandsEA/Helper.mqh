@@ -67,3 +67,45 @@ bool ClosePositions(int all_buy_sell){
    }
    return true;
 }
+
+//Calculate lots
+bool CalculateLots(double slDistance, double &lots){
+   lots=0.0;
+   if(InpLotMode==LOT_MODE_FIXED){
+      lots=InpVolume;
+   }
+   else{
+      double tickSize=SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE);
+      double tickValue=SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_VALUE);
+      double volumeStep=SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_STEP);
+      
+      double riskMoney = InpLotMode==LOT_MODE_MONEY?InpVolume:AccountInfoDouble(ACCOUNT_EQUITY)*InpVolume*0.01;
+      double moneyVolumeStep=(slDistance/tickSize)*tickValue*volumeStep;
+      
+      lots=MathFloor(riskMoney/moneyVolumeStep)*volumeStep;
+   }
+   //check calculated lots
+   if(!CheckLots(lots)){return false;}
+   
+   return true;
+}
+
+//check lots for min, max and step
+bool CheckLots(double &lots){
+   
+   double min = SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_MIN);
+   double max = SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_MAX);
+   double step = SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_STEP);
+   
+   if(lots<min){
+      Print("Lot size will be set to the minimum allowable volume");
+      lots=min;
+      return true;
+   }
+   if(lots>max){
+      Print("Lot size greater than the maximum allowabl volume. lots:",lots,", max:",max);
+      return false;
+   }
+   lots=(int)MathFloor(lots/step)*step;
+   return  true;
+}
