@@ -22,12 +22,12 @@ bool CheckInputs(){
       Alert("Wrong input: Lots size <= 0");
       return(false);
    }
-   if(InpStopLoss<=0){
-      Alert("Wrong input: Stop loss <= 0");
+   if(InpStopLoss<0){
+      Alert("Wrong input: Stop loss < 0");
       return(false);
    }
-   if(InpTakeProfit<=0){
-      Alert("Wrong input: Take profit <= 0");
+   if(InpTakeProfit<0){
+      Alert("Wrong input: Take profit < 0");
       return(false);
    }
    if(InpBBPeriod<=0){
@@ -37,6 +37,9 @@ bool CheckInputs(){
    if(InpDeviation<=0){
       Alert("Wrong input: Deviation <= 0");
       return(false);
+   }
+   if(InpTakeProfit<=0&&!InpCloseAtBase){
+      Alert("Warning: no take profit and no close at base");
    }
    return true;
 }
