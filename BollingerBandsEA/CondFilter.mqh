@@ -6,8 +6,8 @@
 
 bool Filter(bool buy_sell){
    if(buy_sell){// buy
-      return   RSI_Buffer[0]>=InpRSIUpperBand;
+      return   InpRSIPeriod>0?RSI_Buffer[0]>=InpRSIUpperBand:true;
    }else{// sell
-      return   RSI_Buffer[0]<=InpRSILowerBand;
+      return   InpRSIPeriod>0?RSI_Buffer[0]<=InpRSILowerBand:true;
    }
 }
