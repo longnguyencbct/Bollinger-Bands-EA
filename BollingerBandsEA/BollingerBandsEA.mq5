@@ -12,6 +12,7 @@
 #include "GlobalVar.mqh"
 #include "Helper.mqh"
 #include "CondTrigger.mqh"
+#include "CondFilter.mqh"
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
@@ -20,6 +21,7 @@ int OnInit()
    if(!CheckInputs()){return INIT_PARAMETERS_INCORRECT;}
    trade.SetExpertMagicNumber(InpMagicnumber);
    
+   // Init Bollinger Bands
    BB_handle=iBands(_Symbol,InpTimeframe,InpBBPeriod,1,InpDeviation,PRICE_CLOSE);
    if(BB_handle==INVALID_HANDLE){
       Alert("Failed to create Bollinger Bands indicatior handle");
@@ -30,6 +32,16 @@ int OnInit()
    ArraySetAsSeries(BB_baseBuffer,true);
    ArraySetAsSeries(BB_lowerBuffer,true);
    
+   // Init RSI
+   if(InpRSIPeriod>0){
+      RSI_handle=iRSI(_Symbol,InpTimeframe,InpRSIPeriod,PRICE_CLOSE);
+      if(RSI_handle==INVALID_HANDLE){
+         Alert("Failed to create RSI indicatior handle");
+         return INIT_FAILED;
+      }
+      
+      ArraySetAsSeries(RSI_Buffer,true);
+   }
    return(INIT_SUCCEEDED);
 }
 //+------------------------------------------------------------------+
@@ -38,8 +50,10 @@ int OnInit()
 void OnDeinit(const int reason)
 {
    //releae Bollinger Bands indicator handle
-  if(BB_handle!=INVALID_HANDLE){IndicatorRelease(BB_handle);}
-  
+   if(BB_handle!=INVALID_HANDLE){IndicatorRelease(BB_handle);}
+   if(InpRSIPeriod>0){
+      if(RSI_handle!=INVALID_HANDLE){IndicatorRelease(RSI_handle);}
+   }
    
 }
 //+------------------------------------------------------------------+
@@ -53,6 +67,7 @@ void OnTick()
    PreviousTickBid=currentTick.bid;
    //Get current tick
    if(!SymbolInfoTick(_Symbol,currentTick)){Print("Failed to get tick"); return;}
+   
    //get indicator values
    Print("ask:"+string(currentTick.ask)+", bid:"+string(currentTick.bid)+", Prev_ask:"+string(PreviousTickAsk)+", Prev_bid:"+string(PreviousTickBid));////////
    int values=CopyBuffer(BB_handle,0,0,1,BB_baseBuffer)
@@ -60,18 +75,28 @@ void OnTick()
              +CopyBuffer(BB_handle,2,0,1,BB_lowerBuffer);
              
    if(values!=3){
-      Print("Failed to get indicator values");
+      Print("Failed to get Bollinger Bands indicator values");
       return;
    }
-   
-   Comment("up[0]:",BB_upperBuffer[0],
-           "\nbase[0]:",BB_baseBuffer[0],
-           "\nlow[0]:",BB_lowerBuffer[0]);
+   if(InpRSIPeriod>0){
+      int values=CopyBuffer(RSI_handle,3,0,1,RSI_Buffer);
+          
+      if(values!=1){
+         Print("Failed to get RSI indicator value");
+         return;
+      }
+   }
+   Comment("Bollinger Bands:",
+           "\n up[0]: ",BB_upperBuffer[0],
+           "\n base[0]: ",BB_baseBuffer[0],
+           "\n low[0]: ",BB_lowerBuffer[0],
+           "RSI:",
+           "\n RSI[0]: ",InpRSIPeriod>0?string(RSI_Buffer[0]):"Deactivated");
            
    //count open positions
    if(!CountOpenPositions(cntBuy,cntSell)){return;}
    //check for lower band cross to open a buy position
-   if(Trigger(true)){
+   if(Trigger(true)&&Filter(true)){
       openTimeBuy=iTime(_Symbol,InpTimeframe,0);
       double sl = currentTick.bid-InpStopLoss*_Point;
       double tp = InpTakeProfit==0?0:currentTick.bid+InpTakeProfit*_Point;
@@ -85,7 +110,7 @@ void OnTick()
       trade.PositionOpen(_Symbol,ORDER_TYPE_BUY,lots,currentTick.ask,sl,tp,"Bollinger bands EA");  
    }
    //check for upper band cross to open a sell position
-   if(Trigger(false)){
+   if(Trigger(false)&&Filter(false)){
       openTimeSell=iTime(_Symbol,InpTimeframe,0);
       double sl = currentTick.ask+InpStopLoss*_Point;
       double tp = InpTakeProfit==0?0:currentTick.ask-InpTakeProfit*_Point;
