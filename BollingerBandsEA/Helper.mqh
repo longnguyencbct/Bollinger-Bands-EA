@@ -103,8 +103,9 @@ bool CheckLots(double &lots){
       return true;
    }
    if(lots>max){
-      Print("Lot size greater than the maximum allowabl volume. lots:",lots,", max:",max);
-      return false;
+      Print("Lot size greater than and will be set to the maximum allowable volume. lots:",lots,", max:",max);
+      lots=max;
+      return true;
    }
    lots=(int)MathFloor(lots/step)*step;
    return  true;

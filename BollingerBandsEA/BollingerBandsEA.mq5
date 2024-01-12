@@ -75,14 +75,16 @@ void OnTick()
              +CopyBuffer(BB_handle,2,0,1,BB_lowerBuffer);
              
    if(values!=3){
-      Print("Failed to get Bollinger Bands indicator values");
+      Print("Failed to get Bollinger Bands indicator values, value:",values);
+      Print(GetLastError());
       return;
    }
    if(InpRSIPeriod>0){
-      int values=CopyBuffer(RSI_handle,3,0,1,RSI_Buffer);
+      int values=CopyBuffer(RSI_handle,0,0,1,RSI_Buffer);
           
       if(values!=1){
-         Print("Failed to get RSI indicator value");
+         Print("Failed to get RSI indicator value, value:",values);
+         Print(GetLastError());
          return;
       }
    }
@@ -90,9 +92,8 @@ void OnTick()
            "\n up[0]: ",BB_upperBuffer[0],
            "\n base[0]: ",BB_baseBuffer[0],
            "\n low[0]: ",BB_lowerBuffer[0],
-           "RSI:",
+           "\nRSI:",
            "\n RSI[0]: ",InpRSIPeriod>0?string(RSI_Buffer[0]):"Deactivated");
-           
    //count open positions
    if(!CountOpenPositions(cntBuy,cntSell)){return;}
    //check for lower band cross to open a buy position

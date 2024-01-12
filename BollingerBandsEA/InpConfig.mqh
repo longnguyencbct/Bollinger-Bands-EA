@@ -20,7 +20,6 @@ input bool InpCloseAtBase = false;              //close trades at base?
 input group "==== RSI ====";
 input int InpRSIPeriod = 14;                    //period (0=off)
 input int InpRSIUpperBand = 70;                 //upper band
-input int InpRSILowerBand = 30;                 //lower band
 
 bool CheckInputs(){
    if(InpMagicnumber<=0){
@@ -53,10 +52,6 @@ bool CheckInputs(){
    }
    if(InpRSIPeriod<0){
       Alert("Wrong input: RSI Period < 0");
-      return(false);
-   }
-   if(!(InpRSILowerBand>=1&&InpRSILowerBand<=50)){
-      Alert("Wrong input: RSI Period not in range [1,50]");
       return(false);
    }
    if(!(InpRSIUpperBand>=50&&InpRSIUpperBand<=99)){
