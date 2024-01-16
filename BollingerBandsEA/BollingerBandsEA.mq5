@@ -69,7 +69,7 @@ void OnTick()
    if(!SymbolInfoTick(_Symbol,currentTick)){Print("Failed to get tick"); return;}
    
    //get indicator values
-   Print("ask:"+string(currentTick.ask)+", bid:"+string(currentTick.bid)+", Prev_ask:"+string(PreviousTickAsk)+", Prev_bid:"+string(PreviousTickBid));////////
+   //Print("ask:"+string(currentTick.ask)+", bid:"+string(currentTick.bid)+", Prev_ask:"+string(PreviousTickAsk)+", Prev_bid:"+string(PreviousTickBid));////////
    int values=CopyBuffer(BB_handle,0,0,1,BB_baseBuffer)
              +CopyBuffer(BB_handle,1,0,1,BB_upperBuffer)
              +CopyBuffer(BB_handle,2,0,1,BB_lowerBuffer);
@@ -88,16 +88,18 @@ void OnTick()
          return;
       }
    }
+   //count open positions
+   if(!CountOpenPositions(cntBuy,cntSell)){return;}
    Comment("Bollinger Bands:",
            "\n up[0]: ",BB_upperBuffer[0],
            "\n base[0]: ",BB_baseBuffer[0],
            "\n low[0]: ",BB_lowerBuffer[0],
            "\nRSI:",
            "\n RSI[0]: ",InpRSIPeriod>0?string(RSI_Buffer[0]):"Deactivated");
-   //count open positions
-   if(!CountOpenPositions(cntBuy,cntSell)){return;}
-   //check for lower band cross to open a buy position
+           
+   // conditions to open a buy position
    if(Trigger(true)&&Filter(true)){
+      Print("Open buy");
       openTimeBuy=iTime(_Symbol,InpTimeframe,0);
       double sl = currentTick.bid-InpStopLoss*_Point;
       double tp = InpTakeProfit==0?0:currentTick.bid+InpTakeProfit*_Point;
@@ -110,8 +112,9 @@ void OnTick()
       
       trade.PositionOpen(_Symbol,ORDER_TYPE_BUY,lots,currentTick.ask,sl,tp,"Bollinger bands EA");  
    }
-   //check for upper band cross to open a sell position
+   // conditions to open a sell position
    if(Trigger(false)&&Filter(false)){
+      Print("Open sell");
       openTimeSell=iTime(_Symbol,InpTimeframe,0);
       double sl = currentTick.ask+InpStopLoss*_Point;
       double tp = InpTakeProfit==0?0:currentTick.ask-InpTakeProfit*_Point;
@@ -120,7 +123,7 @@ void OnTick()
       
       //calculate lots
       double lots;
-      if(!CalculateLots(currentTick.bid-sl,lots)){return;}
+      if(!CalculateLots(sl-currentTick.ask,lots)){return;}
       
       trade.PositionOpen(_Symbol,ORDER_TYPE_SELL,lots,currentTick.bid,sl,tp,"Bollinger bands EA");  
    }
