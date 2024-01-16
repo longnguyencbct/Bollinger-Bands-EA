@@ -155,9 +155,6 @@ void OnTick()
    // Trend Observation
    TrendObservation();
    
-   //Close condition
-   CondClose();
-   
    // conditions to open a buy position
    if(Trigger(true)&&Filter(true)){
       Print("Open buy");
@@ -189,7 +186,9 @@ void OnTick()
       trade.PositionOpen(_Symbol,ORDER_TYPE_SELL,lots,currentTick.bid,sl,tp,"Bollinger bands EA");  
    }
    
-   
+   if(!CountOpenPositions(cntBuy,cntSell)){return;}
+   //Close condition
+   CondClose();
    
    
 }
