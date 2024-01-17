@@ -9,8 +9,8 @@ enum MARKET_STATE{
    NOT_TRENDING_FROM_DOWN
 };
 // Trend Observation variables
-MARKET_STATE curr_state;
-bool new_state=false;
+MARKET_STATE curr_state[];
+bool new_state[];
 
 // Bollinger Bands variables
 int BB_handle;
@@ -28,11 +28,17 @@ int AROON_handle;
 double AROON_Up[];
 double AROON_Down[];
 
-MqlTick currentTick;
+// Multi-Symbol Variables
+string   AllSymbolsString           = "AUDCAD|AUDJPY|AUDNZD|AUDUSD|CADJPY|EURAUD|EURCAD|EURGBP|EURJPY|EURNZD|EURUSD|GBPAUD|GBPCAD|GBPJPY|GBPNZD|GBPUSD|NZDCAD|NZDJPY|NZDUSD|USDCAD|USDCHF|USDJPY";
+int      NumberOfTradeableSymbols;              
+string   SymbolArray[];   
+int      TicksReceivedCount         = 0;
+   
+MqlTick currentTick[];
 CTrade trade;
 
 datetime openTimeBuy=0;
 datetime openTimeSell=0;
-double PreviousTickAsk;
-double PreviousTickBid;
-int cntBuy, cntSell;
+double PreviousTickAsk[];
+double PreviousTickBid[];
+int cntBuy[], cntSell[];

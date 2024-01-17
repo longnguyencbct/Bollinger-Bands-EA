@@ -3,22 +3,22 @@
 //+------------------------------------------------------------------+
 //| Trigger function                                                 |
 //+------------------------------------------------------------------+
-bool Trigger(bool buy_sell){
+bool Trigger(bool buy_sell,int SymbolLoopIndex){
    if(buy_sell){// buy
-      return   cntBuy==0
-               &&currentTick.ask<BB_lowerBuffer[0]
-               &&openTimeBuy!=iTime(_Symbol,InpTimeframe,0);
+      return   cntBuy[SymbolLoopIndex]==0
+               &&currentTick[SymbolLoopIndex].ask<BB_lowerBuffer[0]
+               &&openTimeBuy!=iTime(SymbolArray[SymbolLoopIndex],InpTimeframe,0);
    }else{// sell
-      return   cntSell==0
-               &&currentTick.bid>BB_upperBuffer[0]
-               &&openTimeSell!=iTime(_Symbol,InpTimeframe,0);
+      return   cntSell[SymbolLoopIndex]==0
+               &&currentTick[SymbolLoopIndex].bid>BB_upperBuffer[0]
+               &&openTimeSell!=iTime(SymbolArray[SymbolLoopIndex],InpTimeframe,0);
    }
 }
 //+------------------------------------------------------------------+
 //| Filter function                                                  |
 //+------------------------------------------------------------------+
-bool Filter(bool buy_sell){
-   return RSI_filter(buy_sell)&&AROON_filter(buy_sell);
+bool Filter(bool buy_sell, int SymbolLoopIndex){
+   return RSI_filter(buy_sell)&&AROON_filter(buy_sell,SymbolLoopIndex);
 }
 
 bool RSI_filter(bool buy_sell){
@@ -29,30 +29,30 @@ bool RSI_filter(bool buy_sell){
    }
 }
 
-bool AROON_filter(bool buy_sell){
+bool AROON_filter(bool buy_sell,int SymbolLoopIndex){
    if(buy_sell){// buy
-      return InpAROONPeriod!=0?curr_state==UP_TREND:true;
+      return InpAROONPeriod!=0?curr_state[SymbolLoopIndex]==UP_TREND:true;
    }else{// sell
-      return InpAROONPeriod!=0?curr_state==DOWN_TREND:true;
+      return InpAROONPeriod!=0?curr_state[SymbolLoopIndex]==DOWN_TREND:true;
    }
 }
 //+------------------------------------------------------------------+
 //| Close function                                                   |
 //+------------------------------------------------------------------+
-void CondClose(){
+void CondClose(int SymbolLoopIndex){
    //check for close when there is a new state or new direction
-   if(new_state){
+   if(new_state[SymbolLoopIndex]){
       if(InpCloseCond!=NO_CLOSING){
-         ClosePositions(0);
+         ClosePositions(0,SymbolLoopIndex);
       }
-      new_state=false;
+      new_state[SymbolLoopIndex]=false;
    }
    
    //check for close at cross with base band
-   if(InpCloseAtBase&&cntBuy>0&&currentTick.bid>=BB_baseBuffer[0]){
-      ClosePositions(1);
+   if(InpCloseAtBase&&cntBuy[SymbolLoopIndex]>0&&currentTick[SymbolLoopIndex].bid>=BB_baseBuffer[0]){
+      ClosePositions(1,SymbolLoopIndex);
    }
-   if(InpCloseAtBase&&cntBuy>0&&currentTick.ask<=BB_baseBuffer[0]){
-      ClosePositions(2);
+   if(InpCloseAtBase&&cntBuy[SymbolLoopIndex]>0&&currentTick[SymbolLoopIndex].ask<=BB_baseBuffer[0]){
+      ClosePositions(2,SymbolLoopIndex);
    }
 }

@@ -1,4 +1,5 @@
 #include "InpConfig.mqh"
+#include "GlobalVar.mqh"
 //+------------------------------------------------------------------+
 //| Helper functions                                                 |
 //+------------------------------------------------------------------+
@@ -14,7 +15,7 @@ bool IsNewBar(){
    return false;
 }
 
-bool CountOpenPositions(int &countBuy,int &countSell){
+bool CountOpenPositions(int &countBuy,int &countSell,int SymbolLoopIndex){
    countBuy = 0;
    countSell =0;
    int total= PositionsTotal();
@@ -23,8 +24,10 @@ bool CountOpenPositions(int &countBuy,int &countSell){
       if(positionTicket<=0){Print("Failed to get ticket"); return false;}
       if(!PositionSelectByTicket(positionTicket)){Print("Failed to select position"); return false;}
       long magic;
+      string symbol;
       if(!PositionGetInteger(POSITION_MAGIC,magic)){Print("Failed to get magic"); return false;}
-      if(magic==InpMagicnumber){
+      if(!PositionGetString(POSITION_SYMBOL,symbol)){Print("Failed to get symbol"); return false;}
+      if(magic==InpMagicnumber&&symbol==SymbolArray[SymbolLoopIndex]){
          long type;
          if(!PositionGetInteger(POSITION_TYPE,type)){Print("Failed to get type"); return false;}
          if(type==POSITION_TYPE_BUY){countBuy++;}
@@ -34,25 +37,27 @@ bool CountOpenPositions(int &countBuy,int &countSell){
    return true;
 }
 
-bool NormalizePrice(double price,double &normalizedPrice){
+bool NormalizePrice(double price,double &normalizedPrice, int SymbolLoopIndex){
    double tickSize=0;
-   if(!SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE,tickSize)){
+   if(!SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_TRADE_TICK_SIZE,tickSize)){
       Print("Failed to get tick size");
       return false;
    }
-   normalizedPrice=NormalizeDouble(MathRound(price/tickSize)*tickSize,_Digits);
+   normalizedPrice=NormalizeDouble(MathRound(price/tickSize)*tickSize,int(SymbolInfoInteger(SymbolArray[SymbolLoopIndex],SYMBOL_DIGITS)));
    return true;
 }
 
-bool ClosePositions(int all_buy_sell){
+bool ClosePositions(int all_buy_sell, int SymbolLoopIndex){
    int total= PositionsTotal();
    for(int i=total-1;i>=0;i--){
       ulong positionTicket=PositionGetTicket(i);
       if(positionTicket<=0){Print("Failed to get ticket"); return false;}
       if(!PositionSelectByTicket(positionTicket)){Print("Failed to select position"); return false;}
       long magic;
+      string symbol;
       if(!PositionGetInteger(POSITION_MAGIC,magic)){Print("Failed to get magic"); return false;}
-      if(magic==InpMagicnumber){
+      if(!PositionGetString(POSITION_SYMBOL,symbol)){Print("Failed to get symbol"); return false;}
+      if(magic==InpMagicnumber&&symbol==SymbolArray[SymbolLoopIndex]){
          long type;
          if(!PositionGetInteger(POSITION_TYPE,type)){Print("Failed to get type"); return false;}
          if(all_buy_sell==1&&type==POSITION_TYPE_SELL){continue;}
@@ -69,15 +74,15 @@ bool ClosePositions(int all_buy_sell){
 }
 
 //Calculate lots
-bool CalculateLots(double slDistance, double &lots){
+bool CalculateLots(double slDistance, double &lots, int SymbolLoopIndex){
    lots=0.0;
    if(InpLotMode==LOT_MODE_FIXED){
       lots=InpVolume;
    }
    else{
-      double tickSize=SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE);
-      double tickValue=SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_VALUE);
-      double volumeStep=SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_STEP);
+      double tickSize=SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_TRADE_TICK_SIZE);
+      double tickValue=SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_TRADE_TICK_VALUE);
+      double volumeStep=SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_VOLUME_STEP);
       
       double riskMoney = InpLotMode==LOT_MODE_MONEY?InpVolume:AccountInfoDouble(ACCOUNT_EQUITY)*InpVolume*0.01;
       double moneyVolumeStep=(slDistance/tickSize)*tickValue*volumeStep;
@@ -85,17 +90,17 @@ bool CalculateLots(double slDistance, double &lots){
       lots=MathFloor(riskMoney/moneyVolumeStep)*volumeStep;
    }
    //check calculated lots
-   if(!CheckLots(lots)){return false;}
+   if(!CheckLots(lots,SymbolLoopIndex)){return false;}
    
    return true;
 }
 
 //check lots for min, max and step
-bool CheckLots(double &lots){
+bool CheckLots(double &lots, int SymbolLoopIndex){
    
-   double min = SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_MIN);
-   double max = SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_MAX);
-   double step = SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_STEP);
+   double min = SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_VOLUME_MIN);
+   double max = SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_VOLUME_MAX);
+   double step = SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_VOLUME_STEP);
    
    if(lots<min){
       Print("Lot size will be set to the minimum allowable volume");
