@@ -4,7 +4,7 @@
 #include "GlobalVar.mqh"
 #include "InpConfig.mqh"
 
-void TrendObservation(int SymbolLoopIndex){
+void TrendObservation(){
    if(InpAROONPeriod!=0){
       switch(InpAROONMode){
          case COMPARE_UP_DOWN_MODE:                                                          // ======== COMPARE_UP_DOWN_MODE ======== //

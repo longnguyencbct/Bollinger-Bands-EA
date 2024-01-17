@@ -42,3 +42,5 @@ datetime openTimeSell=0;
 double PreviousTickAsk[];
 double PreviousTickBid[];
 int cntBuy[], cntSell[];
+
+int SymbolLoopIndex;

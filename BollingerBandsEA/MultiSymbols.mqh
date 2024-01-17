@@ -16,7 +16,7 @@ void ResizeIndicatorArrays(){
    ArrayResize(PreviousTickBid, NumberOfTradeableSymbols);
 }
 
-bool InitIndicators(int SymbolLoopIndex){
+bool InitIndicators(){
    // Init Bollinger Bands
    BB_handle=iBands(SymbolArray[SymbolLoopIndex],InpTimeframe,InpBBPeriod,1,InpDeviation,PRICE_CLOSE);
    if(BB_handle==INVALID_HANDLE){
@@ -54,7 +54,7 @@ bool InitIndicators(int SymbolLoopIndex){
    return true;
 }
 
-void OnTickHelper(int SymbolLoopIndex){
+void OnTickHelper(){
    PreviousTickAsk[SymbolLoopIndex]=currentTick[SymbolLoopIndex].ask;
    PreviousTickBid[SymbolLoopIndex]=currentTick[SymbolLoopIndex].bid;
    //Get current tick
@@ -115,7 +115,7 @@ void OnTickHelper(int SymbolLoopIndex){
               "\n Market State: "+curr_state_str);
    }
    //count open positions
-   if(!CountOpenPositions(cntBuy[SymbolLoopIndex],cntSell[SymbolLoopIndex],SymbolLoopIndex)){return;}
+   if(!CountOpenPositions(cntBuy[SymbolLoopIndex],cntSell[SymbolLoopIndex])){return;}
    Comment("Bollinger Bands:",
            "\n up[0]: ",BB_upperBuffer[0],
            "\n base[0]: ",BB_baseBuffer[0],
@@ -125,41 +125,41 @@ void OnTickHelper(int SymbolLoopIndex){
            AROON_string);
            
    // Trend Observation
-   TrendObservation(SymbolLoopIndex);
+   TrendObservation();
    
    // conditions to open a buy position
-   if(Trigger(true,SymbolLoopIndex)&&Filter(true,SymbolLoopIndex)){
+   if(Trigger(true)&&Filter(true)){
       Print("Open buy");
       openTimeBuy=iTime(SymbolArray[SymbolLoopIndex],InpTimeframe,0);
       double sl = currentTick[SymbolLoopIndex].bid-InpStopLoss*SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_POINT);
       double tp = InpTakeProfit==0?0:currentTick[SymbolLoopIndex].bid+InpTakeProfit*SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_POINT);
-      if(!NormalizePrice(sl,sl,SymbolLoopIndex)){return;}
-      if(!NormalizePrice(tp,tp,SymbolLoopIndex)){return;}
+      if(!NormalizePrice(sl,sl)){return;}
+      if(!NormalizePrice(tp,tp)){return;}
       
       //calculate lots
       double lots;
-      if(!CalculateLots(currentTick[SymbolLoopIndex].bid-sl,lots,SymbolLoopIndex)){return;}
+      if(!CalculateLots(currentTick[SymbolLoopIndex].bid-sl,lots)){return;}
       
       trade.PositionOpen(SymbolArray[SymbolLoopIndex],ORDER_TYPE_BUY,lots,currentTick[SymbolLoopIndex].ask,sl,tp,"Bollinger bands EA");  
    }
    // conditions to open a sell position
-   if(Trigger(false,SymbolLoopIndex)&&Filter(false,SymbolLoopIndex)){
+   if(Trigger(false)&&Filter(false)){
       Print("Open sell");
       openTimeSell=iTime(SymbolArray[SymbolLoopIndex],InpTimeframe,0);
       double sl = currentTick[SymbolLoopIndex].ask+InpStopLoss*SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_POINT);
       double tp = InpTakeProfit==0?0:currentTick[SymbolLoopIndex].ask-InpTakeProfit*SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_POINT);
-      if(!NormalizePrice(sl,sl,SymbolLoopIndex)){return;}
-      if(!NormalizePrice(tp,tp,SymbolLoopIndex)){return;}
+      if(!NormalizePrice(sl,sl)){return;}
+      if(!NormalizePrice(tp,tp)){return;}
       
       //calculate lots
       double lots;
-      if(!CalculateLots(sl-currentTick[SymbolLoopIndex].ask,lots,SymbolLoopIndex)){return;}
+      if(!CalculateLots(sl-currentTick[SymbolLoopIndex].ask,lots)){return;}
       
       trade.PositionOpen(SymbolArray[SymbolLoopIndex],ORDER_TYPE_SELL,lots,currentTick[SymbolLoopIndex].bid,sl,tp,"Bollinger bands EA");  
    }
    
-   if(!CountOpenPositions(cntBuy[SymbolLoopIndex],cntSell[SymbolLoopIndex],SymbolLoopIndex)){return;}
+   if(!CountOpenPositions(cntBuy[SymbolLoopIndex],cntSell[SymbolLoopIndex])){return;}
    //Close condition
-   CondClose(SymbolLoopIndex);
+   CondClose();
    
 }

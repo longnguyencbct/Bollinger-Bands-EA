@@ -52,8 +52,8 @@ int OnInit()
    
    Print("All arrays sized to accomodate ", NumberOfTradeableSymbols, " symbols");
    
-   for(int SymbolLoop=0; SymbolLoop < NumberOfTradeableSymbols; SymbolLoop++){
-      if(!InitIndicators(SymbolLoop)){return INIT_FAILED;}
+   for(SymbolLoopIndex=0; SymbolLoopIndex < NumberOfTradeableSymbols; SymbolLoopIndex++){
+      if(!InitIndicators()){return INIT_FAILED;}
    }
    
    return(INIT_SUCCEEDED);
@@ -87,8 +87,8 @@ void OnTick()
    //check if current tick is a bar open tick
    if(!IsNewBar()){return;}
    
-   for(int SymbolLoop=0; SymbolLoop < NumberOfTradeableSymbols; SymbolLoop++){
-      OnTickHelper(SymbolLoop);
+   for(SymbolLoopIndex=0; SymbolLoopIndex < NumberOfTradeableSymbols; SymbolLoopIndex++){
+      OnTickHelper();
    }
    
 }

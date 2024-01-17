@@ -15,7 +15,7 @@ bool IsNewBar(){
    return false;
 }
 
-bool CountOpenPositions(int &countBuy,int &countSell,int SymbolLoopIndex){
+bool CountOpenPositions(int &countBuy,int &countSell){
    countBuy = 0;
    countSell =0;
    int total= PositionsTotal();
@@ -37,7 +37,7 @@ bool CountOpenPositions(int &countBuy,int &countSell,int SymbolLoopIndex){
    return true;
 }
 
-bool NormalizePrice(double price,double &normalizedPrice, int SymbolLoopIndex){
+bool NormalizePrice(double price,double &normalizedPrice){
    double tickSize=0;
    if(!SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_TRADE_TICK_SIZE,tickSize)){
       Print("Failed to get tick size");
@@ -47,7 +47,7 @@ bool NormalizePrice(double price,double &normalizedPrice, int SymbolLoopIndex){
    return true;
 }
 
-bool ClosePositions(int all_buy_sell, int SymbolLoopIndex){
+bool ClosePositions(int all_buy_sell){
    int total= PositionsTotal();
    for(int i=total-1;i>=0;i--){
       ulong positionTicket=PositionGetTicket(i);
@@ -74,7 +74,7 @@ bool ClosePositions(int all_buy_sell, int SymbolLoopIndex){
 }
 
 //Calculate lots
-bool CalculateLots(double slDistance, double &lots, int SymbolLoopIndex){
+bool CalculateLots(double slDistance, double &lots){
    lots=0.0;
    if(InpLotMode==LOT_MODE_FIXED){
       lots=InpVolume;
@@ -90,13 +90,13 @@ bool CalculateLots(double slDistance, double &lots, int SymbolLoopIndex){
       lots=MathFloor(riskMoney/moneyVolumeStep)*volumeStep;
    }
    //check calculated lots
-   if(!CheckLots(lots,SymbolLoopIndex)){return false;}
+   if(!CheckLots(lots)){return false;}
    
    return true;
 }
 
 //check lots for min, max and step
-bool CheckLots(double &lots, int SymbolLoopIndex){
+bool CheckLots(double &lots){
    
    double min = SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_VOLUME_MIN);
    double max = SymbolInfoDouble(SymbolArray[SymbolLoopIndex],SYMBOL_VOLUME_MAX);
