@@ -55,7 +55,6 @@ int OnInit()
    for(SymbolLoopIndex=0; SymbolLoopIndex < NumberOfTradeableSymbols; SymbolLoopIndex++){
       if(!InitIndicators()){return INIT_FAILED;}
    }
-   
    return(INIT_SUCCEEDED);
 }
 
@@ -66,16 +65,16 @@ int OnInit()
 void OnDeinit(const int reason)
 {
    // release Bollinger Bands indicator handle
-   if(BB_handle!=INVALID_HANDLE){IndicatorRelease(BB_handle);}
+   if(BB_handle[SymbolLoopIndex]!=INVALID_HANDLE){IndicatorRelease(BB_handle[SymbolLoopIndex]);}
    
    // release RSI indicator handle
    if(InpRSIPeriod>0){
-      if(RSI_handle!=INVALID_HANDLE){IndicatorRelease(RSI_handle);}
+      if(RSI_handle[SymbolLoopIndex]!=INVALID_HANDLE){IndicatorRelease(RSI_handle[SymbolLoopIndex]);}
    }
    
    //release AROON indicator handle
    if(InpAROONPeriod>0){
-      if(AROON_handle!=INVALID_HANDLE){IndicatorRelease(AROON_handle);}
+      if(AROON_handle[SymbolLoopIndex]!=INVALID_HANDLE){IndicatorRelease(AROON_handle[SymbolLoopIndex]);}
    }
    
 }
@@ -90,6 +89,5 @@ void OnTick()
    for(SymbolLoopIndex=0; SymbolLoopIndex < NumberOfTradeableSymbols; SymbolLoopIndex++){
       OnTickHelper();
    }
-   
 }
 //+------------------------------------------------------------------+

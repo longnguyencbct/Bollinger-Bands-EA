@@ -13,18 +13,18 @@ MARKET_STATE curr_state[];
 bool new_state[];
 
 // Bollinger Bands variables
-int BB_handle;
+int BB_handle[];
 double BB_upperBuffer[];
 double BB_baseBuffer[];
 double BB_lowerBuffer[];
 
 // RSI variables
-int RSI_handle;          
+int RSI_handle[];          
 double RSI_Buffer[]; 
 
 
 //AROON Indicator variables
-int AROON_handle;
+int AROON_handle[];
 double AROON_Up[];
 double AROON_Down[];
 

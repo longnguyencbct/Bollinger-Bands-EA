@@ -8,6 +8,19 @@ void ResizeIndicatorArrays(){
    ArrayResize(curr_state, NumberOfTradeableSymbols);
    ArrayResize(new_state, NumberOfTradeableSymbols);
    
+   ArrayResize(BB_handle, NumberOfTradeableSymbols);
+   ArrayResize(BB_upperBuffer, NumberOfTradeableSymbols);
+   ArrayResize(BB_baseBuffer, NumberOfTradeableSymbols);
+   ArrayResize(BB_lowerBuffer, NumberOfTradeableSymbols);
+   
+   ArrayResize(RSI_handle, NumberOfTradeableSymbols);
+   ArrayResize(RSI_Buffer, NumberOfTradeableSymbols);
+   
+   ArrayResize(AROON_handle, NumberOfTradeableSymbols);
+   ArrayResize(AROON_Up, NumberOfTradeableSymbols);
+   ArrayResize(AROON_Down, NumberOfTradeableSymbols);
+   
+   
    ArrayResize(cntBuy, NumberOfTradeableSymbols);
    ArrayResize(cntSell, NumberOfTradeableSymbols);
    
@@ -18,8 +31,8 @@ void ResizeIndicatorArrays(){
 
 bool InitIndicators(){
    // Init Bollinger Bands
-   BB_handle=iBands(SymbolArray[SymbolLoopIndex],InpTimeframe,InpBBPeriod,1,InpDeviation,PRICE_CLOSE);
-   if(BB_handle==INVALID_HANDLE){
+   BB_handle[SymbolLoopIndex]=iBands(SymbolArray[SymbolLoopIndex],InpTimeframe,InpBBPeriod,1,InpDeviation,PRICE_CLOSE);
+   if(BB_handle[SymbolLoopIndex]==INVALID_HANDLE){
       Alert("Failed to create Bollinger Bands indicatior handle");
       return false;
    }
@@ -30,8 +43,8 @@ bool InitIndicators(){
    
    // Init RSI
    if(InpRSIPeriod>0){
-      RSI_handle=iRSI(SymbolArray[SymbolLoopIndex],InpTimeframe,InpRSIPeriod,PRICE_CLOSE);
-      if(RSI_handle==INVALID_HANDLE){
+      RSI_handle[SymbolLoopIndex]=iRSI(SymbolArray[SymbolLoopIndex],InpTimeframe,InpRSIPeriod,PRICE_CLOSE);
+      if(RSI_handle[SymbolLoopIndex]==INVALID_HANDLE){
          Alert("Failed to create RSI indicatior handle");
          return false;
       }
@@ -41,9 +54,9 @@ bool InitIndicators(){
    
    // Init AROON
    if(InpAROONPeriod>0){
-      AROON_handle=iCustom(SymbolArray[SymbolLoopIndex],InpAROONTimeframe,"Custom\\aroon",InpAROONPeriod,InpAROONShift);
+      AROON_handle[SymbolLoopIndex]=iCustom(SymbolArray[SymbolLoopIndex],InpAROONTimeframe,"Custom\\aroon",InpAROONPeriod,InpAROONShift);
       
-      if(AROON_handle==INVALID_HANDLE){
+      if(AROON_handle[SymbolLoopIndex]==INVALID_HANDLE){
          Alert("Failed to create AROON indicatior handle");
          return false;
       }
@@ -62,9 +75,9 @@ void OnTickHelper(){
    
    //Get Bollinger Bands Indicator values
    //Print("ask:"+string(currentTick.ask)+", bid:"+string(currentTick.bid)+", Prev_ask:"+string(PreviousTickAsk)+", Prev_bid:"+string(PreviousTickBid));////////
-   int values=CopyBuffer(BB_handle,0,0,1,BB_baseBuffer)
-             +CopyBuffer(BB_handle,1,0,1,BB_upperBuffer)
-             +CopyBuffer(BB_handle,2,0,1,BB_lowerBuffer);
+   int values=CopyBuffer(BB_handle[SymbolLoopIndex],0,0,1,BB_baseBuffer)
+             +CopyBuffer(BB_handle[SymbolLoopIndex],1,0,1,BB_upperBuffer)
+             +CopyBuffer(BB_handle[SymbolLoopIndex],2,0,1,BB_lowerBuffer);
              
    if(values!=3){
       Print("Failed to get Bollinger Bands indicator values, value:",values);
@@ -74,7 +87,7 @@ void OnTickHelper(){
    
    //Get RSI Indicator values
    if(InpRSIPeriod>0){
-      int values=CopyBuffer(RSI_handle,0,0,1,RSI_Buffer);
+      int values=CopyBuffer(RSI_handle[SymbolLoopIndex],0,0,1,RSI_Buffer);
           
       if(values!=1){
          Print("Failed to get RSI indicator value, value:",values);
@@ -86,8 +99,8 @@ void OnTickHelper(){
    //Get AROON Indicator values
    string AROON_string="\nAROON: Deactivated";
    if(InpAROONPeriod!=0){
-      int values=CopyBuffer(AROON_handle,0,0,1,AROON_Up)
-                +CopyBuffer(AROON_handle,1,0,1,AROON_Down);
+      int values=CopyBuffer(AROON_handle[SymbolLoopIndex],0,0,1,AROON_Up)
+                +CopyBuffer(AROON_handle[SymbolLoopIndex],1,0,1,AROON_Down);
                 
       if(values!=2){
          Print("Failed to get AROON  indicator values, value:",values);
@@ -116,7 +129,8 @@ void OnTickHelper(){
    }
    //count open positions
    if(!CountOpenPositions(cntBuy[SymbolLoopIndex],cntSell[SymbolLoopIndex])){return;}
-   Comment("Bollinger Bands:",
+   Comment("Current Symbol: ",SymbolArray[SymbolLoopIndex],
+           "\n Bollinger Bands:",
            "\n up[0]: ",BB_upperBuffer[0],
            "\n base[0]: ",BB_baseBuffer[0],
            "\n low[0]: ",BB_lowerBuffer[0],
