@@ -5,6 +5,8 @@
 #include "InpConfig.mqh"
 
 void ResizeIndicatorArrays(){
+   ArrayResize(SymbolArray, NumberOfTradeableSymbols);
+   
    ArrayResize(curr_state, NumberOfTradeableSymbols);
    ArrayResize(new_state, NumberOfTradeableSymbols);
    
@@ -107,7 +109,15 @@ void OnTickHelper(){
          Print(GetLastError());
          return;
       }
-      string curr_state_str;
+      
+   //count open positions
+   if(!CountOpenPositions(cntBuy[SymbolLoopIndex],cntSell[SymbolLoopIndex])){return;}
+   
+           
+   // Trend Observation
+   TrendObservation();
+   
+   string curr_state_str;
       switch(curr_state[SymbolLoopIndex]){
          case UP_TREND:
             curr_state_str="Up Trend";
@@ -122,24 +132,7 @@ void OnTickHelper(){
             curr_state_str="Not Trending from Down";
             break;
       }
-      AROON_string=("\nAROON:"+
-              "\n Up[0]: "+string(AROON_Up[0])+
-              "\n Down[0]: "+string(AROON_Down[0])+
-              "\n Market State: "+curr_state_str);
    }
-   //count open positions
-   if(!CountOpenPositions(cntBuy[SymbolLoopIndex],cntSell[SymbolLoopIndex])){return;}
-   Comment("Current Symbol: ",SymbolArray[SymbolLoopIndex],
-           "\n Bollinger Bands:",
-           "\n up[0]: ",BB_upperBuffer[0],
-           "\n base[0]: ",BB_baseBuffer[0],
-           "\n low[0]: ",BB_lowerBuffer[0],
-           "\nRSI:",
-           "\n RSI[0]: ",InpRSIPeriod>0?string(RSI_Buffer[0]):"Deactivated",
-           AROON_string);
-           
-   // Trend Observation
-   TrendObservation();
    
    // conditions to open a buy position
    if(Trigger(true)&&Filter(true)){

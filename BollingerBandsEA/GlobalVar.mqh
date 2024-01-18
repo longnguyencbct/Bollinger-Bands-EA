@@ -1,6 +1,7 @@
 //+------------------------------------------------------------------+
 //| Global variables                                                 |
 //+------------------------------------------------------------------+
+#include "GraphicalPanel.mqh"
 
 enum MARKET_STATE{
    UP_TREND,
@@ -44,3 +45,11 @@ double PreviousTickBid[];
 int cntBuy[], cntSell[];
 
 int SymbolLoopIndex;
+
+// Graphical Panel Variables
+CGraphicalPanel panel;
+
+int PanelWidth = 500;                     //width in pixels
+int PanelHeight = 500;                    //height in pixels
+int PanelFontsize = 13;                  //fontsize
+color PanelTxtColor = clrWhiteSmoke;      //text color

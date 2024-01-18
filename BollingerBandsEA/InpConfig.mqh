@@ -17,7 +17,8 @@ enum CLOSE_MODE{
 };
 input group "==== General ====";
 static input long InpMagicnumber= 1336;         // magic number
-input string   InpTradeSymbols         = "USDJPYm|EURUSDm";   //Symbol(s) or ALL or CURRENT
+input bool InpDisplayPanel = true;              // display panel?
+input string   InpTradeSymbols         = "GBPUSD_2013-2022|AUDUSD_2013-2022|EURUSD_2013-2022|USDJPY_2013-2022";   //Symbol(s) or ALL or CURRENT
 input double InpVolume = 0.01;                  //lots / money / percent size
 input LOT_MODE_ENUM InpLotMode=LOT_MODE_FIXED;// lot mode
 input int InpStopLoss = 100;                    //stop loss

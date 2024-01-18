@@ -5,14 +5,21 @@
 //+------------------------------------------------------------------+
 
 //check if we hace a bar open tick
-bool IsNewBar(){
+bool IsNewBarHelper(int i){
    static datetime previousTime=0;
-   datetime currentTime=iTime(_Symbol,InpTimeframe,0);
+   datetime currentTime=iTime(SymbolArray[i],InpTimeframe,0);
    if(previousTime!=currentTime){
       previousTime=currentTime;
       return true;
    }
    return false;
+}
+bool IsNewBar(){
+   bool check=false;
+   for(int i=0;i<NumberOfTradeableSymbols;i++){
+      check=check||IsNewBarHelper(i);
+   }
+   return check;
 }
 
 bool CountOpenPositions(int &countBuy,int &countSell){
