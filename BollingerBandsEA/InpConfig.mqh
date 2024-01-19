@@ -6,6 +6,11 @@ enum LOT_MODE_ENUM{
    LOT_MODE_MONEY,// lots based on money
    LOT_MODE_PCT_ACCOUNT// lots based on % account
 };
+enum WITHDRAWAL_MODE{
+   FIXED_WITHDRAWAL,
+   PCT_ACCOUNT_WITHDRAWAL,
+   PCT_PROFIT_WITHDRAWAL
+};
 enum AROON_MODE{
    COMPARE_LEVEL_MODE,        //compare using level
    COMPARE_UP_DOWN_MODE       //compare up and down
@@ -24,6 +29,10 @@ input LOT_MODE_ENUM InpLotMode=LOT_MODE_FIXED;// lot mode
 input int InpStopLoss = 100;                    //stop loss
 input int InpTakeProfit = 200;                  //take profit
 input ENUM_TIMEFRAMES InpTimeframe = PERIOD_H1; //Timeframe
+input group "==== Withdrawal Configuration ===="
+input int InpWithdrawalPeriod = 1;              // Withdrawal Period (0=No Withdrawal)
+input ENUM_TIMEFRAMES InpWithdrawalTimeframe = PERIOD_D1;   // Withdrawal timeframe
+input WITHDRAWAL_MODE InpWithdrawalMode = FIXED_WITHDRAWAL; // Withdrawal Mode
 input group "==== Bollinger Bands ====";
 input int InpBBPeriod = 20;                     //period
 input double InpDeviation = 2.0;                //deviation
@@ -54,6 +63,10 @@ bool CheckInputs(){
    }
    if(InpTakeProfit<0){
       Alert("Wrong input: Take profit < 0");
+      return(false);
+   }
+   if(InpWithdrawalPeriod<0){
+      Alert("Wrong input: Withdrawal Period < 0");
       return(false);
    }
    if(InpBBPeriod<=0){
