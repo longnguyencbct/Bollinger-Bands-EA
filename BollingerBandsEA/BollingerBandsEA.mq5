@@ -15,6 +15,7 @@
 #include "TrendObservation.mqh"
 #include "MultiSymbols.mqh"
 #include "GraphicalPanel.mqh"
+#include "WithdrawalConfig.mqh"
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
@@ -95,6 +96,7 @@ void OnDeinit(const int reason)
 //+------------------------------------------------------------------+
 void OnTick()
 {
+   WithdrawalFunction();
    //check if current tick is a bar open tick
    if(!IsNewBar()){return;}
    

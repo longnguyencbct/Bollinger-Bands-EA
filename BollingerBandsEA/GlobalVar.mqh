@@ -53,3 +53,7 @@ int PanelWidth = 500;                     //width in pixels
 int PanelHeight = 500;                    //height in pixels
 int PanelFontsize = 13;                  //fontsize
 color PanelTxtColor = clrWhiteSmoke;      //text color
+
+//Withdrawal Configuration variables
+
+int currWithdrawBarsCounter =0;
