@@ -60,8 +60,8 @@ bool CheckInputs(){
       Alert("Wrong input: BB Period <= 0");
       return(false);
    }
-   if(InpDeviation<=0){
-      Alert("Wrong input: BB Deviation <= 0");
+   if(InpDeviation<0){
+      Alert("Wrong input: BB Deviation < 0");
       return(false);
    }
    if(InpTakeProfit<=0&&!InpCloseAtBase){

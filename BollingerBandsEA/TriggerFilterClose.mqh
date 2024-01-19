@@ -6,12 +6,10 @@
 bool Trigger(bool buy_sell){
    if(buy_sell){// buy
       return   cntBuy[SymbolLoopIndex]==0
-               &&currentTick[SymbolLoopIndex].ask<BB_lowerBuffer[0]
-               &&openTimeBuy!=iTime(SymbolArray[SymbolLoopIndex],InpTimeframe,0);
+               &&currentTick[SymbolLoopIndex].ask<BB_lowerBuffer[0];
    }else{// sell
       return   cntSell[SymbolLoopIndex]==0
-               &&currentTick[SymbolLoopIndex].bid>BB_upperBuffer[0]
-               &&openTimeSell!=iTime(SymbolArray[SymbolLoopIndex],InpTimeframe,0);
+               &&currentTick[SymbolLoopIndex].bid>BB_upperBuffer[0];
    }
 }
 //+------------------------------------------------------------------+
